@@ -2,6 +2,7 @@
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.util.HashSet;
 import javax.swing.JColorChooser;
 
 /*
@@ -79,6 +80,9 @@ public class MainJFrame extends javax.swing.JFrame {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 jPanel1MousePressed(evt);
             }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jPanel1MouseReleased(evt);
+            }
         });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -98,6 +102,11 @@ public class MainJFrame extends javax.swing.JFrame {
         jTextField1.setRequestFocusEnabled(false);
 
         jButton2.setText("Wyczyść");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -175,7 +184,7 @@ public class MainJFrame extends javax.swing.JFrame {
 
     private void jPanel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MouseClicked
         // TODO add your handling code here:
-        if(jComboBox1.getSelectedIndex() > 0 && draw_figure==false)
+        if(jComboBox1.getSelectedIndex() >0 && draw_figure==false)
         {
             draw_figure = true;
             first_mouse_x = old_mouse_x;
@@ -189,7 +198,7 @@ public class MainJFrame extends javax.swing.JFrame {
 
     private void jPanel1MouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MouseMoved
         // TODO add your handling code here:
-        if(draw_figure = true){
+        if(draw_figure == true){
             int a;
             int b;
             if(first_mouse_x < evt.getX())
@@ -213,11 +222,28 @@ public class MainJFrame extends javax.swing.JFrame {
                 graphics2d.setColor(brushColor);
                 graphics2d.fillRect(first_mouse_x,first_mouse_y,width,height);
             }
+            else if(jComboBox1.getSelectedIndex()==3)
+            {
+             graphics2d.setColor(Color.WHITE);
+             graphics2d.fillOval(first_mouse_x,first_mouse_y,old_width,old_height);
+             graphics2d.setColor(brushColor);
+             graphics2d.fillOval(first_mouse_x,first_mouse_y,width,height);   
+            }
             old_width = width;
             old_height = height;
 
         }
     }//GEN-LAST:event_jPanel1MouseMoved
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        graphics2d.setColor(Color.WHITE);
+        graphics2d.fillRect(0, 0, jPanel1.getWidth(), jPanel1.getHeight());
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jPanel1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MouseReleased
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jPanel1MouseReleased
 
   
     /**
