@@ -1,7 +1,9 @@
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.util.HashSet;
 import javax.swing.JColorChooser;
 
@@ -19,11 +21,17 @@ public class MainJFrame extends javax.swing.JFrame {
     /**
      * Creates new form MainJFrame
      */
+    private BufferedImage canvasImage;
     public MainJFrame() {
         initComponents();
+        canvasImage = new BufferedImage(jPanel1.getWidth(), jPanel1.getHeight(), BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2 = canvasImage.createGraphics();
+        g2.setColor(Color.WHITE);
+        g2.fillRect(0, 0, canvasImage.getWidth(), canvasImage.getHeight());
+        g2.dispose();
         this.brushColor = Color.BLACK;
     }
-
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -38,7 +46,16 @@ public class MainJFrame extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         jComboBox2 = new javax.swing.JComboBox<>();
         jButton1 = new javax.swing.JButton();
-        jPanel1 = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel(){
+            @Override
+            public void paintComponent(Graphics g){
+                super.paintComponent(g);
+                Graphics2D tmp = (Graphics2D) g;
+                if(canvasImage != null){
+                    g.drawImage(canvasImage,0,0,null);
+                }
+            }
+        };
         jTextField1 = new javax.swing.JTextField();
         jButton2 = new javax.swing.JButton();
 
@@ -209,27 +226,21 @@ public class MainJFrame extends javax.swing.JFrame {
         int width = Math.abs(x2 - x1);
         int height = Math.abs(y2 - y1);
 
-        graphics2d = (Graphics2D) jPanel1.getGraphics();
+        // Get panel graphics
+        Graphics2D g = (Graphics2D) jPanel1.getGraphics();
+        // Draw the saved image first
+        g.drawImage(canvasImage, 0, 0, null);
 
-        // Only draw the figure if width and height are both non-zero
         if (width > 0 && height > 0) {
+            g.setColor(brushColor);
             if (jComboBox1.getSelectedIndex() == 1) { // Rectangle
-                graphics2d.setColor(Color.WHITE);
-                graphics2d.fillRect(left, top, old_width, old_height);
-                graphics2d.setColor(brushColor);
-                graphics2d.fillRect(left, top, width, height);
+                g.drawRect(left, top, width, height);
             } else if (jComboBox1.getSelectedIndex() == 3) { // Oval
-                graphics2d.setColor(Color.WHITE);
-                graphics2d.fillOval(left, top, old_width, old_height);
-                graphics2d.setColor(brushColor);
-                graphics2d.fillOval(left, top, width, height);
+                g.drawOval(left, top, width, height);
             }
         }
-
-        old_width = width;
-        old_height = height;
-
-        }
+        g.dispose();
+    }
     }//GEN-LAST:event_jPanel1MouseMoved
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -240,6 +251,31 @@ public class MainJFrame extends javax.swing.JFrame {
 
     private void jPanel1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MouseReleased
         // TODO add your handling code here:
+        if (draw_figure) {
+        int x1 = first_mouse_x;
+        int y1 = first_mouse_y;
+        int x2 = evt.getX();
+        int y2 = evt.getY();
+
+        int left = Math.min(x1, x2);
+        int top = Math.min(y1, y2);
+        int width = Math.abs(x2 - x1);
+        int height = Math.abs(y2 - y1);
+
+        Graphics2D g = canvasImage.createGraphics();
+        g.setColor(brushColor);
+        if (width > 0 && height > 0) {
+            if (jComboBox1.getSelectedIndex() == 1) { // Rectangle
+                g.fillRect(left, top, width, height);
+            } else if (jComboBox1.getSelectedIndex() == 3) { // Oval
+                g.fillOval(left, top, width, height);
+            }
+        }
+        draw_figure = false;
+        g.dispose();
+        // Now repaint the panel to show the update
+        jPanel1.repaint();
+    }
     }//GEN-LAST:event_jPanel1MouseReleased
 
   
