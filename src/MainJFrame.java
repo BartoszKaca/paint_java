@@ -198,39 +198,36 @@ public class MainJFrame extends javax.swing.JFrame {
 
     private void jPanel1MouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MouseMoved
         // TODO add your handling code here:
-        if(draw_figure == true){
-            int a;
-            int b;
-            if(first_mouse_x < evt.getX())
-            {
-                a=first_mouse_x;
-            } else{
-                a = evt.getX();
-            }
-            if (first_mouse_y < evt.getY()){
-                b = first_mouse_y;
-            }else{
-                b = evt.getY();
-            }
-            int width = evt.getX()-a;
-            int height = evt.getY()-b;
-            graphics2d = (Graphics2D)jPanel1.getGraphics();
-            
-            if(jComboBox1.getSelectedIndex()==1){
+        if (draw_figure) {
+        int x1 = first_mouse_x;
+        int y1 = first_mouse_y;
+        int x2 = evt.getX();
+        int y2 = evt.getY();
+
+        int left = Math.min(x1, x2);
+        int top = Math.min(y1, y2);
+        int width = Math.abs(x2 - x1);
+        int height = Math.abs(y2 - y1);
+
+        graphics2d = (Graphics2D) jPanel1.getGraphics();
+
+        // Only draw the figure if width and height are both non-zero
+        if (width > 0 && height > 0) {
+            if (jComboBox1.getSelectedIndex() == 1) { // Rectangle
                 graphics2d.setColor(Color.WHITE);
-                graphics2d.fillRect(first_mouse_x,first_mouse_y,old_width,old_height);
+                graphics2d.fillRect(left, top, old_width, old_height);
                 graphics2d.setColor(brushColor);
-                graphics2d.fillRect(first_mouse_x,first_mouse_y,width,height);
+                graphics2d.fillRect(left, top, width, height);
+            } else if (jComboBox1.getSelectedIndex() == 3) { // Oval
+                graphics2d.setColor(Color.WHITE);
+                graphics2d.fillOval(left, top, old_width, old_height);
+                graphics2d.setColor(brushColor);
+                graphics2d.fillOval(left, top, width, height);
             }
-            else if(jComboBox1.getSelectedIndex()==3)
-            {
-             graphics2d.setColor(Color.WHITE);
-             graphics2d.fillOval(first_mouse_x,first_mouse_y,old_width,old_height);
-             graphics2d.setColor(brushColor);
-             graphics2d.fillOval(first_mouse_x,first_mouse_y,width,height);   
-            }
-            old_width = width;
-            old_height = height;
+        }
+
+        old_width = width;
+        old_height = height;
 
         }
     }//GEN-LAST:event_jPanel1MouseMoved
