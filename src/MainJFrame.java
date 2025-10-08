@@ -5,7 +5,14 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.HashSet;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import javax.imageio.ImageIO;
 import javax.swing.JColorChooser;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -21,7 +28,6 @@ public class MainJFrame extends javax.swing.JFrame {
     /**
      * Creates new form MainJFrame
      */
-    private BufferedImage canvasImage;
     public MainJFrame() {
         initComponents();
         canvasImage = new BufferedImage(jPanel1.getWidth(), jPanel1.getHeight(), BufferedImage.TYPE_INT_RGB);
@@ -30,6 +36,7 @@ public class MainJFrame extends javax.swing.JFrame {
         g2.fillRect(0, 0, canvasImage.getWidth(), canvasImage.getHeight());
         g2.dispose();
         this.brushColor = Color.BLACK;
+        this.polygonPoints = new ArrayList<>();
     }
     
     /**
@@ -58,10 +65,12 @@ public class MainJFrame extends javax.swing.JFrame {
         };
         jTextField1 = new javax.swing.JTextField();
         jButton2 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Ołówek", "Prostokąt", "Linia", "Okrąg" }));
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Ołówek", "Prostokąt", "Linia", "Okrąg", "Wielokąt", "Wypełnienie" }));
         jComboBox1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 jComboBox1MousePressed(evt);
@@ -125,31 +134,51 @@ public class MainJFrame extends javax.swing.JFrame {
             }
         });
 
+        jButton3.setText("Zapisz");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
+        jButton4.setText("Wczytaj");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(1, 1, 1)
-                        .addComponent(jLabel2)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
+                            .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 243, Short.MAX_VALUE)
-                        .addComponent(jButton2)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(1, 1, 1)
+                                .addComponent(jLabel2)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jButton3)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton4)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 126, Short.MAX_VALUE)
+                                .addComponent(jButton2))))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -164,120 +193,329 @@ public class MainJFrame extends javax.swing.JFrame {
                     .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton1)
                     .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton2))
+                    .addComponent(jButton2)
+                    .addComponent(jButton3)
+                    .addComponent(jButton4))
                 .addGap(18, 18, 18)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        this.brushColor = JColorChooser.showDialog(this , "Wybierz kolor", this.brushColor);
-        jTextField1.setBackground(this.brushColor);
+        Color newColor = JColorChooser.showDialog(this, "Wybierz kolor", this.brushColor);
+        if (newColor != null) {
+            this.brushColor = newColor;
+            jTextField1.setBackground(this.brushColor);
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
-
+    private void floodFill(int x, int y, Color fillColor) {
+        if (x < 0 || x >= canvasImage.getWidth() || y < 0 || y >= canvasImage.getHeight()) {
+            return;
+        }
+        
+        int targetColor = canvasImage.getRGB(x, y);
+        int replacementColor = fillColor.getRGB();
+        
+        if (targetColor == replacementColor) {
+            return;
+        }
+        
+        java.util.Stack<int[]> stack = new java.util.Stack<>();
+        stack.push(new int[]{x, y});
+        
+        while (!stack.isEmpty()) {
+            int[] point = stack.pop();
+            int px = point[0];
+            int py = point[1];
+            
+            if (px < 0 || px >= canvasImage.getWidth() || py < 0 || py >= canvasImage.getHeight()) {
+                continue;
+            }
+            
+            if (canvasImage.getRGB(px, py) != targetColor) {
+                continue;
+            }
+            
+            canvasImage.setRGB(px, py, replacementColor);
+            
+            stack.push(new int[]{px + 1, py});
+            stack.push(new int[]{px - 1, py});
+            stack.push(new int[]{px, py + 1});
+            stack.push(new int[]{px, py - 1});
+        }
+    }
     private void jPanel1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MousePressed
         this.old_mouse_x = evt.getX();
         this.old_mouse_y = evt.getY();
+        
+        int selectedTool = jComboBox1.getSelectedIndex();
+        
+        if (selectedTool == 5) {
+            floodFill(evt.getX(), evt.getY(), brushColor);
+            jPanel1.repaint();
+        }
+        else if (selectedTool > 0 && selectedTool < 4 && !draw_figure) {
+            draw_figure = true;
+            first_mouse_x = old_mouse_x;
+            first_mouse_y = old_mouse_y;
+        }
     }//GEN-LAST:event_jPanel1MousePressed
 
     private void jPanel1MouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MouseDragged
-        if(jComboBox1.getSelectedIndex() == 0){
-            this.graphics2d = (Graphics2D) jPanel1.getGraphics();
-            if(this.graphics2d != null){
-                this.graphics2d.setColor(this.brushColor);
-                this.graphics2d.setStroke(new BasicStroke(jComboBox2.getSelectedIndex() + 1));
-                this.graphics2d.drawLine(this.old_mouse_x, this.old_mouse_y, evt.getX(), evt.getY());
+         int selectedTool = jComboBox1.getSelectedIndex();
+        
+        if (selectedTool == 0) { 
+            Graphics2D g2 = canvasImage.createGraphics();
+            if (g2 != null) {
+                g2.setColor(this.brushColor);
+                g2.setStroke(new BasicStroke(jComboBox2.getSelectedIndex() + 1));
+                g2.drawLine(this.old_mouse_x, this.old_mouse_y, evt.getX(), evt.getY());
+                g2.dispose();
             }
             this.old_mouse_x = evt.getX();
             this.old_mouse_y = evt.getY();
+            jPanel1.repaint();
+        }
+        else if (selectedTool >= 1 && selectedTool <= 3 && draw_figure) {
+            Graphics2D g = (Graphics2D) jPanel1.getGraphics();
+            g.drawImage(canvasImage, 0, 0, null);
+            
+            int x1 = first_mouse_x;
+            int y1 = first_mouse_y;
+            int x2 = evt.getX();
+            int y2 = evt.getY();
+            
+            g.setColor(brushColor);
+            g.setStroke(new BasicStroke(jComboBox2.getSelectedIndex() + 1));
+            
+            if (selectedTool == 1) {
+                int left = Math.min(x1, x2);
+                int top = Math.min(y1, y2);
+                int width = Math.abs(x2 - x1);
+                int height = Math.abs(y2 - y1);
+                g.drawRect(left, top, width, height);
+            } else if (selectedTool == 2) { 
+                g.drawLine(x1, y1, x2, y2);
+            } else if (selectedTool == 3) { 
+                int left = Math.min(x1, x2);
+                int top = Math.min(y1, y2);
+                int width = Math.abs(x2 - x1);
+                int height = Math.abs(y2 - y1);
+                g.drawOval(left, top, width, height);
+            }
+            g.dispose();
         }
     }//GEN-LAST:event_jPanel1MouseDragged
 
     private void jComboBox1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jComboBox1MousePressed
 
     }//GEN-LAST:event_jComboBox1MousePressed
-
-    private void jPanel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MouseClicked
-        // TODO add your handling code here:
-        if(jComboBox1.getSelectedIndex() >0 && draw_figure==false)
-        {
-            draw_figure = true;
-            first_mouse_x = old_mouse_x;
-            first_mouse_y = old_mouse_y;
-            old_width = 0;
-            old_height = 0;
-        }else if(0 <= jComboBox1.getSelectedIndex() && draw_figure==true){
+    private void finishPolygon(){
+         if (polygonPoints.size() < 3) {
+            JOptionPane.showMessageDialog(this, "Wielokąt musi mieć co najmniej 3 punkty!", 
+                    "Błąd", JOptionPane.WARNING_MESSAGE);
+            polygonPoints.clear();
             draw_figure = false;
+            jPanel1.repaint();
+            return;
+        }
+        
+        Graphics2D g = canvasImage.createGraphics();
+        g.setColor(brushColor);
+        g.setStroke(new BasicStroke(jComboBox2.getSelectedIndex() + 1));
+        
+        for (int i = 0; i < polygonPoints.size() - 1; i++) {
+            int[] p1 = polygonPoints.get(i);
+            int[] p2 = polygonPoints.get(i + 1);
+            g.drawLine(p1[0], p1[1], p2[0], p2[1]);
+        }
+        
+        int[] first = polygonPoints.get(0);
+        int[] last = polygonPoints.get(polygonPoints.size() - 1);
+        g.drawLine(last[0], last[1], first[0], first[1]);
+        
+        g.dispose();
+        polygonPoints.clear();
+        draw_figure = false;
+        jPanel1.repaint();
+    }
+    private void jPanel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MouseClicked
+  int selectedTool = jComboBox1.getSelectedIndex();
+        
+     
+        if (selectedTool == 4) {
+            if (!draw_figure) {
+             
+                draw_figure = true;
+                polygonPoints.clear();
+                polygonPoints.add(new int[]{evt.getX(), evt.getY()});
+            } else {
+
+                int[] firstPoint = polygonPoints.get(0);
+                double distance = Math.sqrt(Math.pow(evt.getX() - firstPoint[0], 2) + 
+                                           Math.pow(evt.getY() - firstPoint[1], 2));
+                
+                if (distance <= 30 && polygonPoints.size() >= 3) {
+                    finishPolygon();
+                } else if (evt.getClickCount() == 2) {
+                    finishPolygon();
+                } else {
+                   
+                    polygonPoints.add(new int[]{evt.getX(), evt.getY()});
+                }
+            }
         }
     }//GEN-LAST:event_jPanel1MouseClicked
 
     private void jPanel1MouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MouseMoved
         // TODO add your handling code here:
-        if (draw_figure) {
-        int x1 = first_mouse_x;
-        int y1 = first_mouse_y;
-        int x2 = evt.getX();
-        int y2 = evt.getY();
-
-        int left = Math.min(x1, x2);
-        int top = Math.min(y1, y2);
-        int width = Math.abs(x2 - x1);
-        int height = Math.abs(y2 - y1);
-
-        // Get panel graphics
-        Graphics2D g = (Graphics2D) jPanel1.getGraphics();
-        // Draw the saved image first
-        g.drawImage(canvasImage, 0, 0, null);
-
-        if (width > 0 && height > 0) {
+         if (draw_figure && jComboBox1.getSelectedIndex() == 4 && polygonPoints.size() > 0) {
+            Graphics2D g = (Graphics2D) jPanel1.getGraphics();
+            g.drawImage(canvasImage, 0, 0, null);
             g.setColor(brushColor);
-            if (jComboBox1.getSelectedIndex() == 1) { // Rectangle
-                g.drawRect(left, top, width, height);
-            } else if (jComboBox1.getSelectedIndex() == 3) { // Oval
-                g.drawOval(left, top, width, height);
+            g.setStroke(new BasicStroke(jComboBox2.getSelectedIndex() + 1));
+            
+           
+            for (int i = 0; i < polygonPoints.size() - 1; i++) {
+                int[] p1 = polygonPoints.get(i);
+                int[] p2 = polygonPoints.get(i + 1);
+                g.drawLine(p1[0], p1[1], p2[0], p2[1]);
             }
+            
+            
+            int[] lastPoint = polygonPoints.get(polygonPoints.size() - 1);
+            g.drawLine(lastPoint[0], lastPoint[1], evt.getX(), evt.getY());
+            
+            
+            int[] firstPoint = polygonPoints.get(0);
+            double distance = Math.sqrt(Math.pow(evt.getX() - firstPoint[0], 2) + 
+                                       Math.pow(evt.getY() - firstPoint[1], 2));
+            
+            if (distance <= 30 && polygonPoints.size() >= 3) {
+                
+                g.setColor(Color.GREEN);
+                g.setStroke(new BasicStroke(jComboBox2.getSelectedIndex() + 2));
+                g.drawLine(lastPoint[0], lastPoint[1], firstPoint[0], firstPoint[1]);
+            }
+            
+            g.dispose();
         }
-        g.dispose();
-    }
     }//GEN-LAST:event_jPanel1MouseMoved
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
-        graphics2d.setColor(Color.WHITE);
-        graphics2d.fillRect(0, 0, jPanel1.getWidth(), jPanel1.getHeight());
+        Graphics2D g2 = canvasImage.createGraphics();
+        g2.setColor(Color.WHITE);
+        g2.fillRect(0, 0, canvasImage.getWidth(), canvasImage.getHeight());
+        g2.dispose();
+        jPanel1.repaint();
+        draw_figure = false;
+        polygonPoints.clear();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jPanel1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MouseReleased
         // TODO add your handling code here:
-        if (draw_figure) {
-        int x1 = first_mouse_x;
-        int y1 = first_mouse_y;
-        int x2 = evt.getX();
-        int y2 = evt.getY();
-
-        int left = Math.min(x1, x2);
-        int top = Math.min(y1, y2);
-        int width = Math.abs(x2 - x1);
-        int height = Math.abs(y2 - y1);
-
-        Graphics2D g = canvasImage.createGraphics();
-        g.setColor(brushColor);
-        if (width > 0 && height > 0) {
-            if (jComboBox1.getSelectedIndex() == 1) { // Rectangle
-                g.fillRect(left, top, width, height);
-            } else if (jComboBox1.getSelectedIndex() == 3) { // Oval
-                g.fillOval(left, top, width, height);
+       if (!draw_figure) return;
+        
+        int selectedTool = jComboBox1.getSelectedIndex();
+        
+        
+        if (selectedTool >= 1 && selectedTool <= 3) {
+            int x1 = first_mouse_x;
+            int y1 = first_mouse_y;
+            int x2 = evt.getX();
+            int y2 = evt.getY();
+            
+            Graphics2D g = canvasImage.createGraphics();
+            g.setColor(brushColor);
+            g.setStroke(new BasicStroke(jComboBox2.getSelectedIndex() + 1));
+            
+            if (selectedTool == 1) { 
+                int left = Math.min(x1, x2);
+                int top = Math.min(y1, y2);
+                int width = Math.abs(x2 - x1);
+                int height = Math.abs(y2 - y1);
+                if (width > 0 && height > 0) {
+                    g.drawRect(left, top, width, height);
+                }
+            } else if (selectedTool == 2) { 
+                g.drawLine(x1, y1, x2, y2);
+            } else if (selectedTool == 3) { 
+                int left = Math.min(x1, x2);
+                int top = Math.min(y1, y2);
+                int width = Math.abs(x2 - x1);
+                int height = Math.abs(y2 - y1);
+                if (width > 0 && height > 0) {
+                    g.drawOval(left, top, width, height);
+                }
             }
+            
+            g.dispose();
+            draw_figure = false;
+            jPanel1.repaint();
         }
-        draw_figure = false;
-        g.dispose();
-        // Now repaint the panel to show the update
-        jPanel1.repaint();
-    }
     }//GEN-LAST:event_jPanel1MouseReleased
 
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // TODO add your handling code here:
+         JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Zapisz obraz");
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("Obrazy PNG", "png");
+        fileChooser.setFileFilter(filter);
+        
+        int result = fileChooser.showSaveDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            String path = file.getAbsolutePath();
+            if (!path.toLowerCase().endsWith(".png")) {
+                file = new File(path + ".png");
+            }
+            
+            try {
+                ImageIO.write(canvasImage, "PNG", file);
+                JOptionPane.showMessageDialog(this, "Obraz zapisany pomyślnie!", 
+                        "Sukces", JOptionPane.INFORMATION_MESSAGE);
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(this, "Błąd podczas zapisywania obrazu: " + e.getMessage(), 
+                        "Błąd", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        // TODO add your handling code here:
+           JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Wczytaj obraz");
+        FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                "Pliki obrazów", "png", "jpg", "jpeg", "gif", "bmp");
+        fileChooser.setFileFilter(filter);
+        
+        int result = fileChooser.showOpenDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            
+            try {
+                BufferedImage loadedImage = ImageIO.read(file);
+                if (loadedImage != null) {
+                    Graphics2D g2 = canvasImage.createGraphics();
+                    g2.drawImage(loadedImage, 0, 0, null);
+                    g2.dispose();
+                    jPanel1.repaint();
+                    JOptionPane.showMessageDialog(this, "Obraz wczytany pomyślnie!", 
+                            "Sukces", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Nie można wczytać obrazu!", 
+                            "Błąd", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(this, "Błąd podczas wczytywania obrazu: " + e.getMessage(), 
+                        "Błąd", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_jButton4ActionPerformed
+    
   
     /**
      * @param args the command line arguments
@@ -313,7 +551,7 @@ public class MainJFrame extends javax.swing.JFrame {
             }
         });
     }
-    
+    private BufferedImage canvasImage;
     private Graphics2D graphics2d;
     private Color brushColor;
     private int old_mouse_x, old_mouse_y;
@@ -322,10 +560,13 @@ public class MainJFrame extends javax.swing.JFrame {
     int first_mouse_y = 0;
     int old_width = 0;
     int old_height = 0;
+    private ArrayList<int[]> polygonPoints;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JComboBox<String> jComboBox2;
     private javax.swing.JLabel jLabel1;
