@@ -110,6 +110,11 @@ public class MainJFrame extends javax.swing.JFrame {
                 jPanel1MouseReleased(evt);
             }
         });
+        jPanel1.addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                jPanel1ComponentResized(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -197,7 +202,7 @@ public class MainJFrame extends javax.swing.JFrame {
                     .addComponent(jButton3)
                     .addComponent(jButton4))
                 .addGap(18, 18, 18)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -515,6 +520,33 @@ public class MainJFrame extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jPanel1ComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jPanel1ComponentResized
+        // TODO add your handling code here:
+        int newWidth = jPanel1.getWidth();
+        int newHeight = jPanel1.getHeight();
+        
+
+        if (newWidth > canvasImage.getWidth() || newHeight > canvasImage.getHeight()) {
+           
+            int maxWidth = Math.max(newWidth, canvasImage.getWidth());
+            int maxHeight = Math.max(newHeight, canvasImage.getHeight());
+            
+            BufferedImage newImage = new BufferedImage(maxWidth, maxHeight, BufferedImage.TYPE_INT_RGB);
+            Graphics2D g2 = newImage.createGraphics();
+            
+
+            g2.setColor(Color.WHITE);
+            g2.fillRect(0, 0, maxWidth, maxHeight);
+            
+
+            g2.drawImage(canvasImage, 0, 0, null);
+            g2.dispose();
+     
+            canvasImage = newImage;
+            jPanel1.repaint();
+        }
+    }//GEN-LAST:event_jPanel1ComponentResized
     
   
     /**
